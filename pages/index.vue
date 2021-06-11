@@ -31,13 +31,15 @@
 <script>
 export default {
   layout: "home",
-  // middleware: "auth",
+  middleware: "auth",
   async fetch() {
-    await this.$store.dispatch("nota/list", this.usuario.id);
+    if (this.$nuxt.isOnline) {
+      await this.$store.dispatch("nota/list", this.usuario.id);
+    }
   },
   computed: {
     usuario() {
-      // return this.$store.state.auth.user;
+      return this.$store.state.auth.user;
     },
     notas() {
       return this.$store.state.nota.list;

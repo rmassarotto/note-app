@@ -1,14 +1,23 @@
 <template>
   <div>
-    <b-input-group>
-      <b-form-tags
-        class="bg-warning border-0 text-dark"
-        tag-variant="dark"
-        placeholder="Adicione tags"
-        v-model="tags"
-        @input="addTag"
-      ></b-form-tags>
-    </b-input-group>
+    <b-form-tag
+      class="my-2"
+      v-for="(tag, index) of value"
+      :key="index"
+      no-remove
+    >
+      {{ tag.nome }}
+    </b-form-tag>
+
+    <b-form-group>
+      <b-form-input
+        class="bg-warning border-0 titulo text-dark my-2"
+        type="text"
+        placeholder="Categorize sua nota com tags"
+        v-model="tag"
+        @keyup.enter="adicionar()"
+      ></b-form-input>
+    </b-form-group>
   </div>
 </template>
 
@@ -16,18 +25,23 @@
 export default {
   name: "n-tag",
   props: {
-    tags: [Array, String],
+    value: Array,
   },
   data() {
-    return {};
+    return {
+      tag: null,
+    };
   },
   methods: {
-    async addTag() {
-      this.$emit("addTag", this.tags);
+    adicionar() {
+      !this.isDuplicado(this.tag) && this.value.push({ nome: this.tag });
+      this.tag = null;
+    },
+    isDuplicado(nomeTag) {
+      return this.value.find((t) => t.nome == nomeTag);
     },
   },
 };
 </script>
 
-<style>
-</style>
+<style></style>

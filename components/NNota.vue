@@ -28,8 +28,8 @@
           v-model="this.nota.checklists"
         ></n-checklist>
 
-        <n-tag :tags="nota.tags" @addTag="addTags($event)"> </n-tag>
-        {{ nota.tags }}
+        <n-tag v-model="nota.tags" />
+
         <b-button
           type="button"
           variant="warning"
@@ -59,7 +59,7 @@ export default {
         criadoEm: null,
         atualizadoEm: null,
         checklists: [],
-        tags: ["asdasd", "aaaaa"],
+        tags: [],
       },
     };
   },
@@ -104,16 +104,33 @@ export default {
 
       await this.carregar();
     },
+    async carregaStore() {
+      const list = this.$store.state.nota.list;
+      var result = list.find((obj) => {
+        return obj.id === this.id;
+      });
+      if (result) {
+        this.nota = JSON.parse(JSON.stringify(result));
+      }
+      if (this.$nuxt.isOnline) {
+        await this.$store.dispatch("nota/edit", this.nota);
+      }
+    },
     async carregar() {
-      const { data } = await this.$axios.get(`nota/${this.id}`);
-
-      this.nota = data;
-
-      this.habilitarChecklist(this.nota.checklists.length > 0);
+      if (this.$nuxt.isOnline) {
+        console.log("Online");
+        const { data } = await this.$axios.get(`nota/${this.id}`);
+        this.nota = data;
+        this.habilitarChecklist(this.nota.checklists.length > 0);
+      } else {
+        console.log("Offline");
+        await this.carregaStore();
+      }
     },
   },
   async mounted() {
     if (this.id) {
+      await this.carregaStore();
       await this.carregar();
     }
   },
